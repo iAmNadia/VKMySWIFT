@@ -29,7 +29,7 @@ class NewsViewController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         refreshControl.addTarget(self, action: #selector(NewsViewController.refreshNews), for: UIControl.Event.valueChanged)
         refreshControl.attributedTitle = NSAttributedString(string: "Update News", attributes: nil)
         if #available(iOS 10.0, *) {
@@ -39,7 +39,10 @@ class NewsViewController: UICollectionViewController {
         }
         
         refreshNews()
-        
+        LoadNews()
+
+    }
+    func LoadNews() {
         posts = RealmProvider.loadFromRealm(News.self)
         profiless = RealmProvider.loadFromRealm(User.self)
         groups = RealmProvider.loadFromRealm(Group.self)
@@ -95,36 +98,41 @@ class NewsViewController: UICollectionViewController {
         
     }
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NewsCell", for: indexPath) as? NewsCell
-            else { return UICollectionViewCell() }
-        
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NewsCell", for: indexPath) as? NewsCell else { fatalError() }
+           // else { return UICollectionViewCell() }
+
         guard let posts = posts, let profiles = profiless, let groups = self.groups else { return UICollectionViewCell() }
         let post = posts[indexPath.row]
         cell.textNews.needsUpdateConstraints()
         cell.textNews.sizeToFit()
+        cell.dataAdd.text = getCellDateText(forIndexPath: indexPath, andTimestamp: post.date)
         if post.sourceId > 0 {
-            
+
             guard let profile = profiles.filter("id = %@", post.sourceId).first else { return UICollectionViewCell() }
-            
+
             cell.user.kf.setImage(with: URL(string: profile.imageString))
             cell.userName.text = profile.author
-            cell.dataAdd.text = getCellDateText(forIndexPath: indexPath, andTimestamp: post.date)
-            
+
         } else {
             guard let group = groups.filter("id = %@", -post.sourceId).first else { return UICollectionViewCell() }
-            
-            cell.dataAdd.text = getCellDateText(forIndexPath: indexPath, andTimestamp: post.date)
-            cell.user.kf.setImage(with: URL(string: group.imageGroup))
-            cell.userName.text = group.groupName
-            
+
             cell.configPhotoGoup(with: group)
-            
+            cell.configPhotoNews(with: post)
         }
-        cell.configPhotoNews(with: posts[indexPath.row])
-        
-        
+     cell.configPhotoNews(with: posts[indexPath.row])
+
         return cell
     }
+    
+//    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TextNewsCell", for: indexPath) as? TextNewsCell
+//        else { fatalError() }
+//
+//        let post = posts?[indexPath.row]
+//        cell.configure(with: post!)
+//
+//       // return cell.convert(UITableViewCell, to: UICollectionViewCell)
+//    }
     
     func getCellDateText(forIndexPath indexPath: IndexPath, andTimestamp timestamp: Double) -> String {
         if let stringDate = dateTextCache[indexPath] {
@@ -137,15 +145,25 @@ class NewsViewController: UICollectionViewController {
             return stringDate
         }
     }
+   
     @objc func refreshNews() {
         // функционал обновления новостей
         //
         
         collectionView.reloadData()
         refreshControl.endRefreshing()
+        LoadNews()
     }
 }
-
+//extension NewsViewController: UICollectionViewDataSourcePrefetching {
+//    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+//        let rows = Set(indexPaths.map { $0.row })
+//        if rows.contains((posts?.count)!-1) {
+//            print("NNNews")
+//        }
+//    }
+//    
+//}
 extension UICollectionView {
     func makeChanges(deletions: [Int], insertions: [Int], modifications: [Int]) {
         performBatchUpdates({

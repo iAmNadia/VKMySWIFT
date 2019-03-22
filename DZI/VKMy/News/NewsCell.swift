@@ -8,6 +8,7 @@
 
 import UIKit
 import Kingfisher
+import SnapKit
 
 protocol CellForButtonsDelegate {
     func didTapCompleteButton(indexPath: IndexPath)
@@ -27,7 +28,7 @@ class NewsCell: UICollectionViewCell {
             textNews.translatesAutoresizingMaskIntoConstraints = false
             textNews.numberOfLines = 0
             textNews.lineBreakMode = .byWordWrapping
-           
+            textNews.font = UIFont(name: "System", size: 15)
         }
     }
     @IBOutlet weak var dataAdd: UILabel! {
@@ -72,7 +73,7 @@ class NewsCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-              
+        
     }
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -83,9 +84,9 @@ class NewsCell: UICollectionViewCell {
         super.init(coder: aDecoder)
         setupText()
     }
-
- func nameFrame() {
-  
+    
+    func nameFrame() {
+        
         let nameSize: CGFloat = 50
         let name = CGSize(width: 250, height: nameSize)
         let nameOrigin = CGPoint(x: 110.0 , y: 6.0)
@@ -95,8 +96,7 @@ class NewsCell: UICollectionViewCell {
         }
     }
     
-   
- func dateFrame() {
+    func dateFrame() {
         
         let dateSize: CGFloat = 50
         let date = CGSize(width: 250, height: dateSize)
@@ -138,13 +138,11 @@ class NewsCell: UICollectionViewCell {
         textNews?.leftAnchor.constraint(equalTo: ViewOne.leftAnchor, constant:  10).isActive = true
         textNews?.topAnchor.constraint(equalTo: user.bottomAnchor, constant:  10).isActive = true
         textNews?.rightAnchor.constraint(equalTo: ViewOne.rightAnchor, constant:  -10).isActive = true
-        
+       
         if textNews?.numberOfLines == 1 || textNews?.numberOfLines == 0 {
             textNews?.heightAnchor.constraint(equalToConstant: 30).isActive = true
-            
         } else  {
             textNews?.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        
         }
     }
     
@@ -170,19 +168,45 @@ class NewsCell: UICollectionViewCell {
     
     public func configPhotoNews(with photo: News){
         
-        textNews.text = photo.contentText
         textNews.sizeToFit()
-        //like.text = photo.likesCount
         letter.text = photo.repostsCount
         eye.text = photo.viewsCount
         photoNews.kf.setImage(with: URL(string: photo.photoNews))
         like.text = photo.likesCount
+        textNews.text = photo.contentText
+        
+        if textNews.intrinsicContentSize.height > 100 {
+            let showMoreButton = UIButton()
+            showMoreButton.backgroundColor = .gray
+            showMoreButton.setTitle("Show More...", for: [])
+            textNews.addSubview(showMoreButton)
+            
+            showMoreButton.snp.makeConstraints { make in
+                make.right.equalTo(10)
+                make.top.equalTo(5)
+                make.height.equalTo(20)
+                make.bottom.equalToSuperview()
+            }
+            
+            textNews.snp.makeConstraints { make in
+                make.height.lessThanOrEqualTo(100)
+            }
+        }
     }
     public func configPhotoGoup(with photo: Group){
-        photoNews.kf.setImage(with: URL(string: photo.imageGroup))
+        user.kf.setImage(with: URL(string: photo.imageGroup))
         userName.text = photo.groupName
         
     }
+    override func prepareForReuse() {
+        textNews.subviews.forEach { $0.removeFromSuperview() }
+        
+    }
+    
+    
+    
+    
+    
     //          _//_//_//_
     
     
