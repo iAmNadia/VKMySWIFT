@@ -47,11 +47,9 @@ class News: Object  {
         self.init()
         
         self.type = json["type"].stringValue
-        self.photoNews = json["attachments"][0]["photo"]["sizes"][7]["url"].stringValue
         self.sourceId = json["source_id"].intValue
         self.date = json["date"].doubleValue
         self.postId = json["post_id"].intValue
-        self.contentText = json["text"].stringValue
         self.commentsCount = json["comments"]["count"].stringValue
         self.comments = json["comments"]["count"].intValue
         self.likesCount = json["likes"]["count"].stringValue
@@ -61,6 +59,11 @@ class News: Object  {
         self.usersLike = json["likes"]["user_likes"].intValue
         self.id = json["id"].intValue
         self.reposts = json["reposts"]["count"].intValue
-
+        
+        if self.type == "post" {
+           self.photoNews = json["attachments"][0]["photo"]["sizes"][7]["url"].stringValue
+           self.contentText = json["text"].stringValue
+        }
+        
     }
 }

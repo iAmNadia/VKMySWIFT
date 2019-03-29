@@ -15,6 +15,8 @@ protocol CellForButtonsDelegate {
 
 class NewsCell: UICollectionViewCell {
     static let reuseId = "NewsCell"
+    @IBOutlet weak var photoHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var textHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var ViewOne: NewsCell!
     @IBOutlet weak var photoNews: UIImageView! {
         didSet {
@@ -27,7 +29,6 @@ class NewsCell: UICollectionViewCell {
             textNews.translatesAutoresizingMaskIntoConstraints = false
             textNews.numberOfLines = 0
             textNews.lineBreakMode = .byWordWrapping
-           
         }
     }
     @IBOutlet weak var dataAdd: UILabel! {
@@ -172,17 +173,26 @@ class NewsCell: UICollectionViewCell {
         
         textNews.text = photo.contentText
         textNews.sizeToFit()
-        //like.text = photo.likesCount
         letter.text = photo.repostsCount
         eye.text = photo.viewsCount
-        photoNews.kf.setImage(with: URL(string: photo.photoNews))
         like.text = photo.likesCount
+      //  user.kf.setImage(with: URL(string: photo.))
+        photoNews.kf.setImage(with: URL(string: photo.photoNews))
+        if photo.photoNews.isEmpty {
+            self.photoHeightConstraint = nil
+        }
+       
+        if photo.contentText.isEmpty {
+            self.textHeightConstraint = nil
+        }
     }
     public func configPhotoGoup(with photo: Group){
+        
         photoNews.kf.setImage(with: URL(string: photo.imageGroup))
         userName.text = photo.groupName
         
-    }
+        }
+  
     //          _//_//_//_
     
     

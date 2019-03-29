@@ -39,40 +39,7 @@ class NewsViewController: UICollectionViewController {
         }
         
         refreshNews()
-        
-        posts = RealmProvider.loadFromRealm(News.self)
-        profiless = RealmProvider.loadFromRealm(User.self)
-        groups = RealmProvider.loadFromRealm(Group.self)
-        
-        networkService.getPosts { (posts, profiles, groups, error) in
-            DispatchQueue.main.async {
-                
-                if let error = error {
-                    print(error.localizedDescription)
-                    return
-                }
-                guard let posts = posts, let profiles = profiles, let groups = groups else { return }
-                
-                do {
-                    let realm = try Realm(configuration: RealmProvider.config)
-                    
-                    try realm.write {
-                        realm.delete(RealmProvider.loadFromRealm(News.self))
-                        realm.add(posts)
-                        
-                        realm.delete(RealmProvider.loadFromRealm(User.self))
-                        realm.add(profiles)
-                        
-                        realm.delete(RealmProvider.loadFromRealm(Group.self))
-                        realm.add(groups)
-                        
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                    
-                }
-            }
-        }
+         loadNews()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -116,6 +83,11 @@ class NewsViewController: UICollectionViewController {
             cell.dataAdd.text = getCellDateText(forIndexPath: indexPath, andTimestamp: post.date)
             cell.user.kf.setImage(with: URL(string: group.imageGroup))
             cell.userName.text = group.groupName
+            if post.type == "post" {
+                cell.photoHeightConstraint?.isActive = true
+            } else {
+                cell.photoHeightConstraint?.isActive = false
+            }
             
             cell.configPhotoGoup(with: group)
             
@@ -125,7 +97,42 @@ class NewsViewController: UICollectionViewController {
         
         return cell
     }
-    
+     private func loadNews(completion: (() -> Void)? = nil) {
+            posts = RealmProvider.loadFromRealm(News.self)
+            profiless = RealmProvider.loadFromRealm(User.self)
+            groups = RealmProvider.loadFromRealm(Group.self)
+            
+            networkService.getPosts { (posts, profiles, groups, error) in
+                DispatchQueue.main.async {
+                    
+                    if let error = error {
+                        print(error.localizedDescription)
+                        return
+                    }
+                    guard let posts = posts, let profiles = profiles, let groups = groups else { return }
+                    
+                    do {
+                        let realm = try Realm(configuration: RealmProvider.config)
+                        
+                        try realm.write {
+                            realm.delete(RealmProvider.loadFromRealm(News.self))
+                            realm.add(posts)
+                            
+                            realm.delete(RealmProvider.loadFromRealm(User.self))
+                            realm.add(profiles)
+                            
+                            realm.delete(RealmProvider.loadFromRealm(Group.self))
+                            realm.add(groups)
+                            
+                        }
+                    } catch {
+                        print(error.localizedDescription)
+                        
+                    }
+                }
+            }
+        }
+
     func getCellDateText(forIndexPath indexPath: IndexPath, andTimestamp timestamp: Double) -> String {
         if let stringDate = dateTextCache[indexPath] {
             return stringDate
@@ -138,11 +145,10 @@ class NewsViewController: UICollectionViewController {
         }
     }
     @objc func refreshNews() {
-        // функционал обновления новостей
-        //
         
         collectionView.reloadData()
         refreshControl.endRefreshing()
+        loadNews()
     }
 }
 
