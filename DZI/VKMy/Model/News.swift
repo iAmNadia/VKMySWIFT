@@ -47,10 +47,9 @@ class News: Object  {
     convenience init(json: JSON) {
         self.init()
         self.marketAs = json["marked_as_ads"].intValue
-        
-        if self.type == "post" {
-            if self.marketAs == 0 {
-                
+        let swPost = self.type == "post"
+        switch swPost {
+        case self.marketAs == 0:
             self.attachmentType = json["attachments"][0]["type"].stringValue
             self.type = json["type"].stringValue
             self.sourceId = json["source_id"].intValue
@@ -67,23 +66,41 @@ class News: Object  {
             self.reposts = json["reposts"]["count"].intValue
             self.photoNews = json["attachments"][0]["photo"]["sizes"][6]["url"].stringValue
             self.contentText = json["text"].stringValue
+            self.attachmentType = json["attachments"][0]["type"].stringValue
+            self.type = json["type"].stringValue
+            self.sourceId = json["source_id"].intValue
+            self.date = json["date"].doubleValue
+            self.postId = json["post_id"].intValue
+            self.commentsCount = json["comments"]["count"].stringValue
+            self.comments = json["comments"]["count"].intValue
+            self.likesCount = json["likes"]["count"].stringValue
+            self.repostsCount = json["reposts"]["count"].stringValue
+            self.viewsCount = json["views"]["count"].stringValue
+            self.viewsWatches = json["views"]["count"].intValue
+            self.usersLike = json["likes"]["user_likes"].intValue
+            self.id = json["id"].intValue
+            self.reposts = json["reposts"]["count"].intValue
+            self.photoNews = json["attachments"][0]["photo"]["sizes"][6]["url"].stringValue
+            self.contentText = json["text"].stringValue
+       
+            if self.attachmentType == "doc" {
+                                    self.photoNews = json["attachments"][0]["doc"]["preview"]["photo"]["sizes"][2]["src"].stringValue
+                                }
+                                if self.attachmentType == "video" {
                 
-                if self.attachmentType == "doc" {
-                    self.photoNews = json["attachments"][0]["doc"]["preview"]["photo"]["sizes"][2]["src"].stringValue
-                }
-                if self.attachmentType == "video" {
-                    
-                    self.photoNews = json["attachments"][0]["video"]["photo_1280"].stringValue
-                }
-                if self.attachmentType == "link" {
-                    self.photoNews = json["attachments"][0]["link"]["photo"]["sizes"][3]["url"].stringValue
-                    self.contentText = json["attachments"][0]["link"]["title"].stringValue
-                }
-                if self.marketAs != 0 {
-                    self.photoNews = json["copy_history"][0]["attachments"][0]["photo"]["sizes"][6]["url"].stringValue
-                    self.contentText = json["copy_history"][0]["text"].stringValue
-                }
-            }
+                                    self.photoNews = json["attachments"][0]["video"]["photo_1280"].stringValue
+                                }
+                                if self.attachmentType == "link" {
+                                    self.photoNews = json["attachments"][0]["link"]["photo"]["sizes"][3]["url"].stringValue
+                                    self.contentText = json["attachments"][0]["link"]["title"].stringValue
+                                }
+            
+        case self.marketAs != 0:
+            self.photoNews = json["copy_history"][0]["attachments"][0]["photo"]["sizes"][6]["url"].stringValue
+            self.contentText = json["copy_history"][0]["text"].stringValue
+        default: break 
+        
         }
     }
 }
+

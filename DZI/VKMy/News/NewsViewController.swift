@@ -83,18 +83,15 @@ class NewsViewController: UICollectionViewController {
             cell.dataAdd.text = getCellDateText(forIndexPath: indexPath, andTimestamp: post.date)
             cell.user.kf.setImage(with: URL(string: group.imageGroup))
             cell.userName.text = group.groupName
-//            if post.type == "post" {
-//
-//                cell.photoNews.isHidden = false
-//                cell.photoHeightConstraint?.constant = 100
-//            } else {
-//                //cell.photoHeightConstraint?.isActive = false
-//                cell.photoNews.isHidden = true
-//                cell.photoHeightConstraint?.constant = 0
-//            }
-            
-            cell.configPhotoGoup(with: group)
-            
+            if post.type == "post" {
+
+                cell.photoNews.isHidden = false
+                cell.photoHeightConstraint?.constant = 100
+            } else {
+                //cell.photoHeightConstraint?.isActive = false
+                cell.photoNews.isHidden = true
+                cell.photoHeightConstraint?.constant = 0
+            }
         }
         cell.configPhotoNews(with: posts[indexPath.row])
         

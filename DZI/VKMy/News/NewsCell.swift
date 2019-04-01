@@ -8,6 +8,7 @@
 
 import UIKit
 import Kingfisher
+import SnapKit
 
 protocol CellForButtonsDelegate {
     func didTapCompleteButton(indexPath: IndexPath)
@@ -29,6 +30,7 @@ class NewsCell: UICollectionViewCell {
             textNews.translatesAutoresizingMaskIntoConstraints = false
             textNews.numberOfLines = 0
             textNews.lineBreakMode = .byWordWrapping
+            
         }
     }
     @IBOutlet weak var dataAdd: UILabel! {
@@ -60,6 +62,9 @@ class NewsCell: UICollectionViewCell {
             
         }
     }
+    static let offset: CGFloat = 8
+    private var textHeight: CGFloat = 0
+    private let offset: CGFloat = 8
     
     @IBOutlet weak var likeButton: UIButton!
     @IBOutlet weak var like: UILabel!
@@ -73,20 +78,20 @@ class NewsCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-              
+        
     }
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupText()
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        setupText()
+        
     }
-
- func nameFrame() {
-  
+    
+    func nameFrame() {
+        
         let nameSize: CGFloat = 50
         let name = CGSize(width: 250, height: nameSize)
         let nameOrigin = CGPoint(x: 110.0 , y: 6.0)
@@ -96,8 +101,7 @@ class NewsCell: UICollectionViewCell {
         }
     }
     
-   
- func dateFrame() {
+    func dateFrame() {
         
         let dateSize: CGFloat = 50
         let date = CGSize(width: 250, height: dateSize)
@@ -107,65 +111,14 @@ class NewsCell: UICollectionViewCell {
             self.dataAdd?.frame = CGRect(origin: dateOrigin, size: date)
         }
     }
-    
-    func setupName() {
+    func texxtFrame() {
         
-        userName?.leftAnchor.constraint(equalTo: user.leftAnchor, constant:  50).isActive = false
-        userName?.topAnchor.constraint(equalTo: ViewOne.bottomAnchor, constant:  70).isActive = true
-        userName?.rightAnchor.constraint(equalTo: ViewOne.rightAnchor, constant:  -10).isActive = true
-        userName?.heightAnchor.constraint(equalToConstant: 50).isActive = true
-    }
-    
-    func setupDate() {
-        
-        dataAdd?.leftAnchor.constraint(equalTo: user.leftAnchor, constant:  30).isActive = true
-        dataAdd?.topAnchor.constraint(equalTo: userName.bottomAnchor, constant:  10).isActive = true
-        dataAdd?.rightAnchor.constraint(equalTo: ViewOne.rightAnchor, constant:  -10).isActive = true
-        
-        dataAdd?.heightAnchor.constraint(equalToConstant: 50).isActive = true
-    }
-    
-    func setupUser() {
-        
-        user?.leftAnchor.constraint(equalTo: ViewOne.leftAnchor, constant:  10).isActive = true
-        user?.topAnchor.constraint(equalTo: ViewOne.bottomAnchor, constant:  10).isActive = true
-        user?.rightAnchor.constraint(equalTo: ViewOne.rightAnchor, constant:  -80).isActive = true
-        
-        user?.heightAnchor.constraint(equalToConstant: 50).isActive = true
-    }
-    
-    func setupText() {
-        
-        textNews?.leftAnchor.constraint(equalTo: ViewOne.leftAnchor, constant:  10).isActive = true
-        textNews?.topAnchor.constraint(equalTo: user.bottomAnchor, constant:  10).isActive = true
-        textNews?.rightAnchor.constraint(equalTo: ViewOne.rightAnchor, constant:  -10).isActive = true
-        
-        if textNews?.numberOfLines == 1 || textNews?.numberOfLines == 0 {
-            textNews?.heightAnchor.constraint(equalToConstant: 30).isActive = true
-            
-        } else  {
-            textNews?.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        
-        }
-    }
-    
-    func setupPhoto() {
-        
-        photoNews?.leftAnchor.constraint(equalTo: ViewOne.leftAnchor, constant:  10).isActive = true
-        photoNews?.topAnchor.constraint(equalTo: textNews.bottomAnchor, constant:  10).isActive = true
-        photoNews?.rightAnchor.constraint(equalTo: ViewOne.rightAnchor, constant:  -10).isActive = true
-        
-        photoNews?.heightAnchor.constraint(equalToConstant: 50).isActive = true
-    }
-    
-    func iconFrame() {
-        
-        let iconSize: CGFloat = 50
-        let icon = CGSize(width: iconSize, height: iconSize)
-        let iconOrigin = CGPoint(x: 10.0 , y: 3.0)
+        let dateSize: CGFloat = 50
+        let date = CGSize(width: 250, height: dateSize)
+        let dateOrigin = CGPoint(x: 10.0 , y: 96.0 )
         
         DispatchQueue.main.async {
-            self.user?.frame = CGRect(origin: iconOrigin, size: icon)
+            self.textNews?.frame = CGRect(origin: dateOrigin, size: date)
         }
     }
     
@@ -176,109 +129,53 @@ class NewsCell: UICollectionViewCell {
         letter.text = photo.repostsCount
         eye.text = photo.viewsCount
         like.text = photo.likesCount
-      //  user.kf.setImage(with: URL(string: photo.))
+        
+        if textNews.intrinsicContentSize.height > 100 {
+            let showMoreButton = UIButton()
+            showMoreButton.backgroundColor = .gray
+            showMoreButton.setTitle("Show More...", for: [])
+            textNews.addSubview(showMoreButton)
+            
+            showMoreButton.snp.makeConstraints { make in
+                make.right.equalTo(10)
+                make.top.equalTo(5)
+                make.height.equalTo(20)
+                make.bottom.equalToSuperview()
+            }
+            
+            textNews.snp.makeConstraints { make in
+                make.height.lessThanOrEqualTo(100)
+            }
+        }
+        
         photoNews.kf.setImage(with: URL(string: photo.photoNews))
         if photo.photoNews.isEmpty {
             self.photoHeightConstraint = nil
         }
-       
+        
         if photo.contentText.isEmpty {
             self.textHeightConstraint = nil
         }
     }
     public func configPhotoGoup(with photo: Group){
         
-        photoNews.kf.setImage(with: URL(string: photo.imageGroup))
+        user.kf.setImage(with: URL(string: photo.imageGroup))
         userName.text = photo.groupName
         
-        }
-  
-    //          _//_//_//_
-    
-    
-    
-    
-    
-    
-    public func configure(with item: News, completion: @escaping () -> Void) {
+    }
+    public func configPhotoUser(with photo: User){
         
-        let attrStr = try! NSAttributedString(data: (item.contentText.data(using: String.Encoding.unicode, allowLossyConversion: true)!), options: [.documentType: NSAttributedString.DocumentType.html],  documentAttributes: nil)
-        textNews.attributedText = attrStr
+        user.kf.setImage(with: URL(string: photo.imageString))
+        userName.text = photo.author
         
     }
     
-    public func config(news: News, profile: User, group: Group) {
-        
-        userName.text = String(profile.author)
-        textNews.text = news.contentText
-        letter.text = String(news.commentsCount)
-        send.text = String(news.repostsCount)
-        eye.text = String(news.viewsCount)
-        like.text = String(news.likesCount)
-        user.kf.setImage(with: URL(string: profile.imageString))
-        user.kf.setImage(with: URL(string: group.imageGroup))
-    }
-    func configure(author: String, photoUrl: String, userPhoto: User, text: String, likes: Int, comments: Int, reposts: Int, watches: Int) {
-        
-        self.userName.text = author
-        let url = URL(string: photoUrl)
-        self.user.kf.setImage(with: url)
-        self.textNews.text = text
-        self.like.tag = likes
-        //self.likeButton.tag = userLikes
-        self.letter.tag = comments
-        self.send.tag = reposts
-        self.eye.tag  = watches
-        // self.user.kf.setImage(with: URL(string: photoUrl))
-        self.user.kf.setImage(with: URL(string: userPhoto.imageString))
-    }
-    
-    public func configPhotoUser(with userStr: User){
-        user.kf.setImage(with: URL(string: userStr.imageString))
-        userName.text = userStr.firstName
-        
-    }
-    
-    
-    public var commentsCount = 0 {
-        didSet {
-            letter.text = "\(commentsCount)"
-        }
-    }
-    public var repostsCount = 0 {
-        didSet {
-            send.text = "\(repostsCount)"
-        }
-    }
-    public var watchesCount = 0 {
-        didSet {
-            eye.text = "\(watchesCount)"
-        }
-    }
-    
-    public func configures(with item: News, completion: @escaping () -> Void) {
-        
-        let attrStr = try! NSAttributedString(data: (item.contentText.data(using: String.Encoding.unicode, allowLossyConversion: true)!), options: [.documentType: NSAttributedString.DocumentType.html],  documentAttributes: nil)
-        textNews.attributedText = attrStr
-        
-        if item.sourceId < 0, let group = item.group {
-            self.userName.text = group.groupName
-            self.user.kf.setImage(with: NetworkService.urlForIcon(group.imageGroup))
-        } else if item.sourceId > 0, let user = item.user {
-            self.userName.text = user.surName
-            self.user.kf.setImage(with: NetworkService.urlForIcon(user.imageString))
-        } else {
-            self.userName.text = ""
-            self.user.image = UIImage(contentsOfFile: "emptyImage.png")
-        }
-        
-        if item.type == "photo" {
-            self.eye.isHidden = true
-        } else {
-            self.eye.isHidden = false
-        }
-        user.kf.setImage(with: URL(string:item.photoNews)) { _ in
-            completion()
-        }
+    override func prepareForReuse() {
+        textNews.subviews.forEach { $0.removeFromSuperview() }
     }
 }
+
+
+
+
+
