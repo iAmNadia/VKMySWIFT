@@ -83,11 +83,15 @@ class NewsViewController: UICollectionViewController {
             cell.dataAdd.text = getCellDateText(forIndexPath: indexPath, andTimestamp: post.date)
             cell.user.kf.setImage(with: URL(string: group.imageGroup))
             cell.userName.text = group.groupName
-            if post.type == "post" {
-                cell.photoHeightConstraint?.isActive = true
-            } else {
-                cell.photoHeightConstraint?.isActive = false
-            }
+//            if post.type == "post" {
+//
+//                cell.photoNews.isHidden = false
+//                cell.photoHeightConstraint?.constant = 100
+//            } else {
+//                //cell.photoHeightConstraint?.isActive = false
+//                cell.photoNews.isHidden = true
+//                cell.photoHeightConstraint?.constant = 0
+//            }
             
             cell.configPhotoGoup(with: group)
             
@@ -98,6 +102,7 @@ class NewsViewController: UICollectionViewController {
         return cell
     }
      private func loadNews(completion: (() -> Void)? = nil) {
+        
             posts = RealmProvider.loadFromRealm(News.self)
             profiless = RealmProvider.loadFromRealm(User.self)
             groups = RealmProvider.loadFromRealm(Group.self)
@@ -110,7 +115,6 @@ class NewsViewController: UICollectionViewController {
                         return
                     }
                     guard let posts = posts, let profiles = profiles, let groups = groups else { return }
-                    
                     do {
                         let realm = try Realm(configuration: RealmProvider.config)
                         
@@ -123,15 +127,14 @@ class NewsViewController: UICollectionViewController {
                             
                             realm.delete(RealmProvider.loadFromRealm(Group.self))
                             realm.add(groups)
-                            
                         }
                     } catch {
                         print(error.localizedDescription)
-                        
+                        }
                     }
                 }
             }
-        }
+    
 
     func getCellDateText(forIndexPath indexPath: IndexPath, andTimestamp timestamp: Double) -> String {
         if let stringDate = dateTextCache[indexPath] {
