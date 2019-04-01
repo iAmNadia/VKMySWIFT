@@ -29,7 +29,7 @@ class NewsService {
             "return_banned": 0
         ]
         
-        Alamofire.request(url, method: .get, parameters: params).responseJSON {
+        Alamofire.request(url, method: .get, parameters: params).responseJSON(queue: DispatchQueue.global())  {
             response in
             switch response.result {
             case .success(let value):
@@ -40,11 +40,12 @@ class NewsService {
                 DispatchQueue.main.async {
                     completion?(posts, profiles, groups, nil)}
             case .failure(let error):
+                 DispatchQueue.main.async {
                 completion?(nil, nil, nil, error)
-           }
+                }
+            }
         }
     }
-    
     func loadNews(completion: @escaping ([News],[User],[Group]) -> Void) {
         let parameters: Parameters = [
             
@@ -76,6 +77,46 @@ class NewsService {
                 completion(news, profiles, group)
             }
         }
+    }
+    private let queueNetworking = DispatchQueue(label: "ru.vkmy.networkservice", qos: .utility, attributes: [.concurrent])
+    
+    enum likeAction {
+        case add
+        case delete
+    }
+    
+    func pushLikeRequest(action: likeAction, ownerId: Int, itemId: Int, itemType: String, completion: ((Int?, Error?) -> Void)? = nil) {
+        
+        let path: String
+        switch action {
+        case .add:
+            path = baseUrl + "/method/likes.add"
+        case .delete:
+            path = baseUrl + "/method/likes.delete"
+        }
+        let parameters: Parameters = [
+            "type": itemType,
+            "owner_id": ownerId,
+            "item_id": itemId,
+            "access_token": Session.shared.token,
+            "version": "5.92"
+        ]
+        Alamofire.request(path, method: .get, parameters:
+            parameters).responseJSON (queue: DispatchQueue.global(), completionHandler: {
+        //(queue: queueNetworking, completionHandler: {
+                response in
+                switch response.result {
+                case .failure(let error):
+                       DispatchQueue.main.async {
+                    completion?(nil, error)}
+                case .success(let value):
+                    let json = JSON(value)
+                    let likes = json["response"]["likes"].intValue
+                       DispatchQueue.main.async {
+                    completion?(likes, nil)
+                    }
+                }
+            })
     }
 }
 
